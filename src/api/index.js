@@ -39,4 +39,7 @@ export default {
     }
     throw new Error(data.message || '上传失败');
   }),
+
+  // 游记相关
+  getNotes: () => request({ url: '/note' }),
 }; 
