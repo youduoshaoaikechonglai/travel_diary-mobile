@@ -1,0 +1,59 @@
+.login-page {
+  padding: 40px 20px;
+  background: #fff;
+  min-height: 100vh;
+}
+
+.switch-tab {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 30px;
+  font-size: 18px;
+  font-weight: bold;
+  color: #999;
+
+  Text {
+    margin: 0 30px;
+    cursor: pointer;
+
+    &.active {
+      color: #1890ff;
+      border-bottom: 2px solid #1890ff;
+    }
+  }
+}
+
+.form-item {
+  margin-bottom: 24px;
+  position: relative;
+}
+
+.avatar-upload {
+  display: flex;
+  align-items: center;
+
+  .avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    margin-right: 16px;
+    border: 1px solid #eee;
+  }
+}
+
+.ok {
+  color: #52c41a;
+  font-size: 12px;
+  margin-left: 10px;
+}
+
+.err {
+  color: #ff4d4f;
+  font-size: 12px;
+  margin-left: 10px;
+}
+
+.submit-btn {
+  width: 100%;
+  margin-top: 20px;
+}
