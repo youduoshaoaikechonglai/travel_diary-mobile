@@ -4,6 +4,7 @@ export default {
     'pages/index/index',
     'pages/detail/index',
     'pages/my/index',
+    'pages/publish/index'
   ],
   window: {
     backgroundTextStyle: 'light',

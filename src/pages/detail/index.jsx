@@ -8,12 +8,6 @@ import shareIcon from '../../assets/icons/share.png';
 import api from '../../api';
 import './index.scss';
 
-const statusMap = {
-  pending: { text: '待审核', color: '#faad14' },
-  approved: { text: '已通过', color: '#52c41a' },
-  rejected: { text: '未通过', color: '#ff4d4f' }
-};
-
 const Detail = () => {
   const router = Taro.useRouter();
   const { id } = router.params;
@@ -24,6 +18,7 @@ const Detail = () => {
   const [isFullscreenVideo, setIsFullscreenVideo] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
   const [isFollowed, setIsFollowed] = useState(false);
+  const [isCurrentUser, setIsCurrentUser] = useState(false);
   const videoRef = useRef(null);
 
   // 获取游记详情
@@ -73,8 +68,13 @@ const Detail = () => {
         console.log('获取到游记详情:', diaryData);
         setDiary(diaryData);
         
+        // 检查是否是当前登录用户
+        const currentUser = Taro.getStorageSync('user');
+        const isOwner = currentUser && currentUser.id === diaryData.author.id;
+        setIsCurrentUser(isOwner);
+        
         // 检查是否已关注作者
-        if (diaryData.author && diaryData.author.id) {
+        if (diaryData.author && diaryData.author.id && !isOwner) {
           checkFollowStatus(diaryData.author.id);
         }
         
@@ -456,12 +456,14 @@ const Detail = () => {
             />
             <Text className='detail__author-name'>{diary.author?.nickname || diary.author?.username || '未知用户'}</Text>
           </View>
-          <Button 
-            className={`detail__share-btn ${isFollowed ? 'detail__share-btn--followed' : ''}`} 
-            onClick={handleFollow}
-          >
-            <Text className='detail__btn-text'>{isFollowed ? '已关注' : '关注'}</Text>
-          </Button>
+          {!isCurrentUser && (
+            <Button 
+              className={`detail__share-btn ${isFollowed ? 'detail__share-btn--followed' : ''}`} 
+              onClick={handleFollow}
+            >
+              <Text className='detail__btn-text'>{isFollowed ? '已关注' : '关注'}</Text>
+            </Button>
+          )}
         </View>
       )}
 
@@ -504,7 +506,7 @@ const Detail = () => {
                     id="diaryVideo"
                     ref={videoRef}
                     className='detail__video'
-                    src='https://media.w3.org/2010/05/sintel/trailer.mp4'
+                    src={diary.video.url}
                     poster={diary.video.poster || diary.coverImage}
                     initialTime={0}
                     controls

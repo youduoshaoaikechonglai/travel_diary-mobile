@@ -29,6 +29,14 @@ export default function My() {
 
   useEffect(() => {
     fetchMyNotes();
+    
+    // 监听游记更新事件
+    Taro.eventCenter.on('noteUpdated', fetchMyNotes);
+    
+    // 组件卸载时移除事件监听
+    return () => {
+      Taro.eventCenter.off('noteUpdated', fetchMyNotes);
+    };
   }, []);
 
   const handleDelete = async (e, id) => {
@@ -51,7 +59,8 @@ export default function My() {
   };
 
   const handleEdit = (e, id) => {
-    console.log('编辑', id);
+    e.stopPropagation();
+    Taro.navigateTo({ url: `/pages/publish/index?id=${id}` });
   };
 
   const goToDetail = (id) => {

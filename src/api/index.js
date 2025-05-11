@@ -45,4 +45,6 @@ export default {
   getNoteDetail: (id) => request({ url: `/note/${id}` }),
   getMyNotes: (userId) => request({ url: `/note/my/${userId}` }),
   deleteNote: (id) => request({ url: `/note/${id}`, method: 'DELETE' }),
+  createNote: (data) => request({ url: '/note', method: 'POST', data }),
+  updateNote: (data) => request({ url: `/note/${data.id}`, method: 'PUT', data }),
 }; 
