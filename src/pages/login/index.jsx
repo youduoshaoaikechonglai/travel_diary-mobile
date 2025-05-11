@@ -43,7 +43,9 @@ export default function Login() {
         try {
           const uploadRes = await api.uploadAvatar(filePath);
           setAvatar(uploadRes.url);
-        } catch {
+          Taro.showToast({ title: '头像上传成功', icon: 'success' });
+        } catch (error) {
+          console.error('头像上传失败:', error);
           Taro.showToast({ title: '头像上传失败', icon: 'none' });
         }
       }
@@ -64,9 +66,8 @@ export default function Login() {
         username,
         password,
         nickname,
-        avatar: avatar || DEFAULT_AVATAR
+        avatarUrl: avatar || DEFAULT_AVATAR
       });
-      // 注册成功后自动登录
       const user = await api.login({ username, password });
       Taro.setStorageSync('user', user);
       Taro.showToast({ title: '注册成功', icon: 'success' });
@@ -74,6 +75,7 @@ export default function Login() {
         Taro.switchTab({ url: '/pages/index/index' });
       }, 1000);
     } catch (e) {
+      console.error('注册失败:', e);
       Taro.showToast({ title: e.message || '注册失败', icon: 'none' });
     }
     setLoading(false);
