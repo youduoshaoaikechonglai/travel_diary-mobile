@@ -29,10 +29,10 @@ export default function My() {
 
   useEffect(() => {
     fetchMyNotes();
-    
+
     // 监听游记更新事件
     Taro.eventCenter.on('noteUpdated', fetchMyNotes);
-    
+
     // 组件卸载时移除事件监听
     return () => {
       Taro.eventCenter.off('noteUpdated', fetchMyNotes);
@@ -71,6 +71,11 @@ export default function My() {
     Taro.navigateTo({ url: '/pages/publish/index' });
   };
 
+  // 判断是否可以编辑游记
+  const canEdit = (status) => {
+    return status === 'pending' || status === 'rejected';
+  };
+
   return (
     <View className='my'>
       <View className='user-info'>
@@ -84,30 +89,48 @@ export default function My() {
 
       <ScrollView scrollY className='note-list'>
         {notes.map(note => (
-          <View key={note._id} className='note-item' onClick={() => goToDetail(note._id)}>
-            <View className='note-left'>
-              {note.images?.[0] && (
-                <Image className='note-image' src={note.images[0]} mode='aspectFill' />
-              )}
-            </View>
-            <View className='note-right'>
-              <View className='note-content'>
-                <Text className='note-title'>{note.title}</Text>
-                <Text className='note-desc' numberOfLines={2}>{note.content}</Text>
+          <View key={note._id} className='note-card' onClick={() => goToDetail(note._id)}>
+            {/* 上区域：图片、标题和内容 */}
+            <View className='note-card-top'>
+              <View className='note-card-image'>
+                {note.images?.[0] && (
+                  <Image className='image' src={note.images[0]} mode='aspectFill' />
+                )}
               </View>
-              <View className='note-footer'>
-                <Text className='note-status' style={{ backgroundColor: statusMap[note.status]?.color }}>
-                  {statusMap[note.status]?.text}
-                </Text>
-                <View className='note-actions'>
-                  <Text className='action-btn delete' onClick={(e) => handleDelete(e, note._id)}>删除</Text>
-                  <Text className='action-btn edit' onClick={(e) => handleEdit(e, note._id)}>编辑</Text>
-                </View>
+              <View className='note-card-content'>
+                <Text className='title'>{note.title}</Text>
+                <Text className='desc'>{note.content}</Text>
+
+                {/* 显示拒绝原因 */}
+                {note.status === 'rejected' && note.rejectReason && (
+                  <View className='reject-reason'>
+                    <Text className='reject-label'>拒绝原因：</Text>
+                    <Text className='reject-text'>{note.rejectReason}</Text>
+                  </View>
+                )}
+              </View>
+            </View>
+
+            {/* 下区域：状态和操作按钮 */}
+            <View className='note-card-bottom'>
+              <View className='note-status' style={{ backgroundColor: statusMap[note.status]?.color }}>
+                {statusMap[note.status]?.text}
+              </View>
+              <View className='note-actions'>
+                <View className='action-btn delete' onClick={(e) => handleDelete(e, note._id)}>删除</View>
+                {canEdit(note.status) && (
+                  <View className='action-btn edit' onClick={(e) => handleEdit(e, note._id)}>编辑</View>
+                )}
               </View>
             </View>
           </View>
         ))}
         {loading && <Text className='loading'>加载中...</Text>}
+        {!loading && notes.length === 0 && (
+          <View className='empty-notes'>
+            <Text>暂无游记</Text>
+          </View>
+        )}
       </ScrollView>
     </View>
   );

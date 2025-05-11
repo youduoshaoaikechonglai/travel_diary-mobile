@@ -131,7 +131,7 @@ export default function Publish() {
       // 如果是编辑模式，添加ID
       if (isEdit && id) {
         noteData.id = id;
-        await api.updateNote(noteData); // 假设有updateNote API
+        await api.updateNote(noteData);
       } else {
         await api.createNote(noteData);
       }
