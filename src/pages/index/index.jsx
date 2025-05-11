@@ -29,18 +29,34 @@ export default function Index() {
       // 调用 getNotes 接口，但不传递关键字参数
       const result = await api.getNotes({
         page: pageNum,
-        limit: 10
+        limit: 4
       });
       
       // 确保接口返回的是数组
       const newDiaries = Array.isArray(result) ? result : (result?.data || []);
       
       let allDiaries;
-      if (pageNum === 1) {
+      if (pageNum === 1 || isRefresh) {
+        // 第一页或刷新时直接替换数据
         allDiaries = newDiaries;
         setDiaries(newDiaries);
       } else {
-        allDiaries = [...diaries, ...newDiaries];
+        // 去重处理：过滤掉已存在的游记（根据_id判断）
+        const existingIds = new Set(diaries.map(diary => diary._id));
+        const uniqueNewDiaries = newDiaries.filter(diary => !existingIds.has(diary._id));
+        
+        // 如果所有新获取的游记都已存在，则认为没有更多数据了
+        if (uniqueNewDiaries.length === 0) {
+          setHasMore(false);
+          setLoading(false);
+          if (isRefresh) {
+            setRefreshing(false);
+            Taro.stopPullDownRefresh();
+          }
+          return;
+        }
+        
+        allDiaries = [...diaries, ...uniqueNewDiaries];
         setDiaries(allDiaries);
       }
       
@@ -48,7 +64,7 @@ export default function Index() {
       filterDiariesByKeyword(allDiaries, keyword);
       
       // 判断是否还有更多数据
-      setHasMore(newDiaries.length >= 10);
+      setHasMore(newDiaries.length >= 4);
       setPage(pageNum);
     } catch (error) {
       console.error('获取游记列表失败', error);

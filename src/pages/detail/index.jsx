@@ -305,9 +305,12 @@ const Detail = () => {
     
     // 使用Taro API
     try {
-      Taro.createVideoContext('diaryVideo').requestFullScreen({
+      const videoContext = Taro.createVideoContext('diaryVideo');
+      videoContext.requestFullScreen({
         direction: 0, // 0: 正常竖屏, 90: 横屏
       });
+      // 进入全屏后自动播放视频
+      videoContext.play();
     } catch (e) {
       console.error('全屏请求失败:', e);
     }
@@ -315,27 +318,9 @@ const Detail = () => {
 
   // 处理视频点击事件
   const handleVideoClick = (e) => {
-    // 获取点击位置相关信息
-    const { detail } = e;
-    const { x, y } = detail;
     
-    // 获取当前设备信息来计算大概的视频尺寸
-    const info = Taro.getSystemInfoSync();
-    const videoWidth = info.windowWidth; // 假设视频宽度是屏幕宽度
-    const videoHeight = videoWidth * 9 / 16; // 假设16:9的视频比例
-    
-    // 判断是否点击在控制区域（底部控制栏或中间播放按钮区域）
-    const isBottomControlArea = y > videoHeight * 0.8; // 底部控制栏（包括进度条和播放/暂停按钮）
-    
-    // 如果点击在控制区域，不触发全屏
-    if (isBottomControlArea) {
-      console.log('点击在控制区域，不触发全屏');
-      return; // 直接返回，让原生控件处理播放/暂停/进度调整
-    } else {
-      // 只有在非控制区域点击时，才触发全屏
-      console.log('点击在非控制区域，触发全屏');
       handleVideoFullscreen();
-    }
+    
   };
 
   // 视频退出全屏
@@ -530,7 +515,7 @@ const Detail = () => {
                       setIsFullscreenVideo(!!isFullScreen);
                     }}
                     onClick={handleVideoClick}
-                    enableProgressGesture={true} // 启用水平滑动调整进度功能
+                    enableProgressGesture={false} // 启用水平滑动调整进度功能
                     showPlayBtn={true} // 显示播放按钮
                     showMuteBtn={true} // 显示静音按钮
                     objectFit="contain" // 确保视频比例正确
