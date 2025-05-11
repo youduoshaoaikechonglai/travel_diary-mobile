@@ -3,6 +3,21 @@
   min-height: 100vh;
   padding: 20px;
 
+  // 返回按钮
+  .back-btn {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: 10px;
+  }
+
+  .back-icon {
+    width: 24px;
+    height: 24px;
+  }
+
   .form-item {
     background: #fff;
     border-radius: 8px;

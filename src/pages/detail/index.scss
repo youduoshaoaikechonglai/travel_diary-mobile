@@ -25,6 +25,21 @@
     color: #999;
   }
 
+  // 返回按钮
+  &__back-btn {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: 10px;
+  }
+
+  &__back-icon {
+    width: 24px;
+    height: 24px;
+  }
+
   // 顶部作者信息
   &__header {
     display: flex;

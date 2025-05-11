@@ -2,6 +2,7 @@ import { View, Text, Textarea, Input, Button, Image, Video } from '@tarojs/compo
 import { useState, useEffect } from 'react';
 import Taro, { useRouter } from '@tarojs/taro';
 import api from '../../api';
+import backIcon from '../../assets/icons/back.png';
 import './index.scss';
 
 export default function Publish() {
@@ -16,6 +17,11 @@ export default function Publish() {
   const [isEdit, setIsEdit] = useState(false);
 
   const user = Taro.getStorageSync('user');
+
+  // 返回上一页
+  const handleBack = () => {
+    Taro.navigateBack();
+  };
 
   // 校验登录态
   useEffect(() => {
@@ -158,6 +164,10 @@ export default function Publish() {
 
   return (
     <View className='publish'>
+      <View className='back-btn' onClick={handleBack}>
+        <Image className='back-icon' src={backIcon} />
+      </View>
+      
       <View className='form-item'>
         <Input
           className='title-input'

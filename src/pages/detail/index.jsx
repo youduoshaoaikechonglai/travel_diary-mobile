@@ -5,6 +5,7 @@ import heartIcon from '../../assets/icons/heart.png';
 import heartActiveIcon from '../../assets/icons/heart-active.png';
 import messageIcon from '../../assets/icons/message.png';
 import shareIcon from '../../assets/icons/share.png';
+import backIcon from '../../assets/icons/back.png';
 import api from '../../api';
 import './index.scss';
 
@@ -20,6 +21,11 @@ const Detail = () => {
   const [isFollowed, setIsFollowed] = useState(false);
   const [isCurrentUser, setIsCurrentUser] = useState(false);
   const videoRef = useRef(null);
+
+  // 返回上一页
+  const handleBack = () => {
+    Taro.navigateBack();
+  };
 
   // 获取游记详情
   useEffect(() => {
@@ -448,6 +454,9 @@ const Detail = () => {
       {/* 顶部作者信息 - 在视频全屏时隐藏 */}
       {!isFullscreenVideo && (
         <View className='detail__header'>
+          <View className='detail__back-btn' onClick={handleBack}>
+            <Image className='detail__back-icon' src={backIcon} />
+          </View>
           <View className='detail__author'>
             <Image 
               className='detail__author-avatar' 
