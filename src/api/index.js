@@ -56,6 +56,68 @@ export default {
       }
     });
   },
+  
+  // 上传图片
+  uploadImage: (filePath) => {
+    console.log('开始上传图片, 文件路径:', filePath);
+    return Taro.uploadFile({
+      url: `${BASE_URL}/upload/travel-images`,
+      filePath: filePath,
+      name: 'images',
+      success: (res) => {
+        console.log('上传图片成功响应:', res);
+      },
+      fail: (err) => {
+        console.error('上传图片失败:', err);
+      }
+    }).then(res => {
+      try {
+        if (typeof res.data === 'string') {
+          const data = JSON.parse(res.data);
+          if (res.statusCode >= 200 && res.statusCode < 300) {
+            return data;
+          }
+          throw new Error(data.message || '上传失败');
+        } else {
+          return res.data;
+        }
+      } catch (e) {
+        console.error('解析上传响应失败:', e, res);
+        throw new Error('上传图片失败，服务器响应格式错误');
+      }
+    });
+  },
+  
+  // 上传视频
+  uploadVideo: (filePath) => {
+    console.log('开始上传视频, 文件路径:', filePath);
+    return Taro.uploadFile({
+      url: `${BASE_URL}/upload/travel-video`,
+      filePath: filePath,
+      name: 'video',
+      success: (res) => {
+        console.log('上传视频成功响应:', res);
+      },
+      fail: (err) => {
+        console.error('上传视频失败:', err);
+      }
+    }).then(res => {
+      try {
+        if (typeof res.data === 'string') {
+          const data = JSON.parse(res.data);
+          if (res.statusCode >= 200 && res.statusCode < 300) {
+            return data;
+          }
+          throw new Error(data.message || '上传失败');
+        } else {
+          return res.data;
+        }
+      } catch (e) {
+        console.error('解析上传响应失败:', e, res);
+        throw new Error('上传视频失败，服务器响应格式错误');
+      }
+    });
+  },
 
   // 游记相关
   getNotes: () => request({ url: '/note' }),

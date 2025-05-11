@@ -71,22 +71,40 @@ export default function Publish() {
     setLoading(false);
   };
 
+  //选择图片
   const chooseImage = () => {
     Taro.chooseImage({
       count: 9 - images.length,
-      success: (res) => {
-        setImages([...images, ...res.tempFilePaths]);
+      success: async (res) => {
+        const filePath = res.tempFilePaths[0];
+        try {
+          const uploadRes = await api.uploadImage(filePath);
+          setImages([...images, uploadRes.url]);
+          Taro.showToast({ title: '图片上传成功', icon: 'success' });
+        } catch (error) {
+          console.error('图片上传失败:', error);
+          Taro.showToast({ title: '图片上传失败', icon: 'none' });
+        }
       }
     });
   };
 
+  //选择视频
   const chooseVideo = () => {
     Taro.chooseVideo({
       sourceType: ['album', 'camera'],
       maxDuration: 60,
       camera: 'back',
-      success: (res) => {
-        setVideo(res.tempFilePath);
+      success: async (res) => {
+        const filePath = res.tempFilePath;
+        try {
+          const uploadRes = await api.uploadVideo(filePath);
+          setVideo(uploadRes.url);
+          Taro.showToast({ title: '视频上传成功', icon: 'success' });
+        } catch (error) {
+          console.error('视频上传失败:', error);
+          Taro.showToast({ title: '视频上传失败', icon: 'none' });
+        }
       }
     });
   };
