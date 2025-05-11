@@ -44,4 +44,5 @@ export default {
   getNotes: () => request({ url: '/note' }),
   getNoteDetail: (id) => request({ url: `/note/${id}` }),
   getMyNotes: (userId) => request({ url: `/note/my/${userId}` }),
+  deleteNote: (id) => request({ url: `/note/${id}`, method: 'DELETE' }),
 }; 

@@ -31,6 +31,29 @@ export default function My() {
     fetchMyNotes();
   }, []);
 
+  const handleDelete = async (e, id) => {
+    e.stopPropagation();
+    Taro.showModal({
+      title: '提示',
+      content: '确定要删除这篇游记吗？',
+      success: async function (res) {
+        if (res.confirm) {
+          try {
+            await api.deleteNote(id);
+            Taro.showToast({ title: '删除成功', icon: 'success' });
+            fetchMyNotes();
+          } catch (e) {
+            Taro.showToast({ title: '删除失败', icon: 'none' });
+          }
+        }
+      }
+    });
+  };
+
+  const handleEdit = (e, id) => {
+    console.log('编辑', id);
+  };
+
   const goToDetail = (id) => {
     Taro.navigateTo({ url: `/pages/detail/index?id=${id}` });
   };
@@ -47,21 +70,31 @@ export default function My() {
       </View>
       <View className='header'>
         <Text className='title'>我的游记</Text>
-        <View className='publish-btn' onClick={goToPublish}>发布游记</View>
+        <View className='publish-btn' onClick={goToPublish}>+ 新增</View>
       </View>
 
       <ScrollView scrollY className='note-list'>
         {notes.map(note => (
           <View key={note._id} className='note-item' onClick={() => goToDetail(note._id)}>
-            {note.images?.[0] && (
-              <Image className='note-image' src={note.images[0]} mode='aspectFill' />
-            )}
-            <View className='note-content'>
-              <Text className='note-title'>{note.title}</Text>
-              <Text className='note-desc' numberOfLines={2}>{note.content}</Text>
-              <Text className='note-status' style={{ color: statusMap[note.status]?.color }}>
-                {statusMap[note.status]?.text}
-              </Text>
+            <View className='note-left'>
+              {note.images?.[0] && (
+                <Image className='note-image' src={note.images[0]} mode='aspectFill' />
+              )}
+            </View>
+            <View className='note-right'>
+              <View className='note-content'>
+                <Text className='note-title'>{note.title}</Text>
+                <Text className='note-desc' numberOfLines={2}>{note.content}</Text>
+              </View>
+              <View className='note-footer'>
+                <Text className='note-status' style={{ backgroundColor: statusMap[note.status]?.color }}>
+                  {statusMap[note.status]?.text}
+                </Text>
+                <View className='note-actions'>
+                  <Text className='action-btn delete' onClick={(e) => handleDelete(e, note._id)}>删除</Text>
+                  <Text className='action-btn edit' onClick={(e) => handleEdit(e, note._id)}>编辑</Text>
+                </View>
+              </View>
             </View>
           </View>
         ))}
@@ -69,4 +102,4 @@ export default function My() {
       </ScrollView>
     </View>
   );
-} 
+}
