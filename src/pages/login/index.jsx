@@ -90,7 +90,7 @@ export default function Login() {
       Taro.setStorageSync('user', user);
       Taro.showToast({ title: '登录成功', icon: 'success' });
       setTimeout(() => {
-        Taro.switchTab({ url: '/pages/my/index' });
+        Taro.switchTab({ url: '/pages/index/index' });
       }, 1000);
     } catch (e) {
       Taro.showToast({ title: e.message || '登录失败', icon: 'none' });
