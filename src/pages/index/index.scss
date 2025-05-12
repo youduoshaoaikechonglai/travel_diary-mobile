@@ -2,7 +2,7 @@
   min-height: 100vh;
   background-color: #f5f5f5;
   padding-top: 100px;
-  padding-bottom: 60px;
+  // padding-bottom: 60px;
   box-sizing: border-box;
   max-width: 100%;
   overflow-x: hidden;
@@ -50,7 +50,7 @@
   }
   
   &__scroll {
-    height: calc(100vh - 100px - 60px);
+    height: calc(100vh - 100px);
     overflow-y: auto;
   }
   

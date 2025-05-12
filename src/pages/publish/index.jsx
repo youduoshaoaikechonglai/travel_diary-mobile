@@ -15,6 +15,8 @@ export default function Publish() {
   const [video, setVideo] = useState(null);
   const [loading, setLoading] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
+  const MAX_TITLE_LENGTH = 50;
+  const MAX_CONTENT_LENGTH = 2000;
 
   const user = Taro.getStorageSync('user');
 
@@ -125,8 +127,16 @@ export default function Publish() {
       return Taro.showToast({ title: '请填写标题', icon: 'none' });
     }
     
+    if (title.length > MAX_TITLE_LENGTH) {
+      return Taro.showToast({ title: `标题不能超过${MAX_TITLE_LENGTH}个字符`, icon: 'none' });
+    }
+    
     if (!content.trim()) {
       return Taro.showToast({ title: '请填写内容', icon: 'none' });
+    }
+    
+    if (content.length > MAX_CONTENT_LENGTH) {
+      return Taro.showToast({ title: `内容不能超过${MAX_CONTENT_LENGTH}个字符`, icon: 'none' });
     }
     
     if (images.length === 0) {
@@ -191,8 +201,31 @@ export default function Publish() {
           className='title-input'
           placeholder='请输入标题 (必填)'
           value={title}
-          onInput={e => setTitle(e.detail.value)}
+          onInput={e => {
+            const value = e.detail.value;
+            if (value.length <= MAX_TITLE_LENGTH) {
+              setTitle(value);
+            } else {
+              setTitle(value.substring(0, MAX_TITLE_LENGTH));
+              Taro.showToast({
+                title: `标题最多${MAX_TITLE_LENGTH}个字符`,
+                icon: 'none',
+                duration: 1500
+              });
+            }
+          }}
+          maxlength={MAX_TITLE_LENGTH}
+          onBlur={() => {
+            if (title.length >= MAX_TITLE_LENGTH) {
+              Taro.showToast({
+                title: `标题已达到最大字数限制${MAX_TITLE_LENGTH}个字符`,
+                icon: 'none',
+                duration: 1500
+              });
+            }
+          }}
         />
+        <Text className='word-count'>{title.length}/{MAX_TITLE_LENGTH}</Text>
       </View>
 
       <View className='form-item'>
@@ -200,8 +233,31 @@ export default function Publish() {
           className='content-input'
           placeholder='请输入游记内容 (必填)'
           value={content}
-          onInput={e => setContent(e.detail.value)}
+          onInput={e => {
+            const value = e.detail.value;
+            if (value.length <= MAX_CONTENT_LENGTH) {
+              setContent(value);
+            } else {
+              setContent(value.substring(0, MAX_CONTENT_LENGTH));
+              Taro.showToast({
+                title: `内容最多${MAX_CONTENT_LENGTH}个字符`,
+                icon: 'none',
+                duration: 1500
+              });
+            }
+          }}
+          maxlength={MAX_CONTENT_LENGTH}
+          onBlur={() => {
+            if (content.length >= MAX_CONTENT_LENGTH) {
+              Taro.showToast({
+                title: `内容已达到最大字数限制${MAX_CONTENT_LENGTH}个字符`,
+                icon: 'none',
+                duration: 1500
+              });
+            }
+          }}
         />
+        <Text className='word-count'>{content.length}/{MAX_CONTENT_LENGTH}</Text>
       </View>
 
       <View className='form-item'>
