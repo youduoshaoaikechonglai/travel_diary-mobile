@@ -79,16 +79,6 @@ const Detail = () => {
         const isOwner = currentUser && currentUser.id === diaryData.author.id;
         setIsCurrentUser(isOwner);
         
-        // 检查是否已关注作者
-        if (diaryData.author && diaryData.author.id && !isOwner) {
-          checkFollowStatus(diaryData.author.id);
-        }
-        
-        // 检查是否已点赞
-        if (diaryData.id) {
-          checkLikeStatus(diaryData.id);
-        }
-        
       } catch (error) {
         console.error('获取游记详情失败', error);
         Taro.showToast({
@@ -103,17 +93,38 @@ const Detail = () => {
     fetchDiaryDetail();
   }, [id]);
 
+  // 单独使用一个useEffect来处理点赞和关注状态
+  // 这样在用户登录状态变化时，可以正确更新这些状态
+  useEffect(() => {
+    if (diary) {
+      // 检查是否已关注作者
+      if (diary.author && diary.author.id && !isCurrentUser) {
+        checkFollowStatus(diary.author.id);
+      }
+      
+      // 检查是否已点赞
+      if (diary.id) {
+        checkLikeStatus(diary.id);
+      }
+    }
+  }, [diary, isCurrentUser]);
+
   // 检查关注状态
   const checkFollowStatus = async (authorId) => {
     if (!authorId) return;
     
     try {
-      // 这里可以添加检查关注状态的API调用
-      // const followStatus = await userAPI.checkFollowStatus(authorId);
-      // setIsFollowed(followStatus.isFollowed);
+      // 获取当前登录用户
+      const currentUser = Taro.getStorageSync('user');
+      if (!currentUser || !currentUser.id) {
+        // 未登录用户不显示关注状态
+        setIsFollowed(false);
+        return;
+      }
       
       // 临时模拟，实际项目中应该调用API
-      const isFollowedFromStorage = Taro.getStorageSync(`followed_${authorId}`);
+      // 添加当前用户ID到关注存储中，确保每个用户的关注状态独立
+      const isFollowedFromStorage = Taro.getStorageSync(`followed_${currentUser.id}_${authorId}`);
       setIsFollowed(!!isFollowedFromStorage);
     } catch (error) {
       console.error('获取关注状态失败', error);
@@ -125,8 +136,16 @@ const Detail = () => {
     if (!diaryId) return;
     
     try {
-      // 从本地存储读取点赞状态
-      const isLikedFromStorage = Taro.getStorageSync(`liked_diary_${diaryId}`);
+      // 获取当前登录用户
+      const currentUser = Taro.getStorageSync('user');
+      if (!currentUser || !currentUser.id) {
+        // 未登录用户不能点赞
+        setIsLiked(false);
+        return;
+      }
+      
+      // 从本地存储读取点赞状态，加入用户ID确保每个用户状态独立
+      const isLikedFromStorage = Taro.getStorageSync(`liked_diary_${currentUser.id}_${diaryId}`);
       setIsLiked(!!isLikedFromStorage);
     } catch (error) {
       console.error('获取点赞状态失败', error);
@@ -341,15 +360,34 @@ const Detail = () => {
   const handleLike = async () => {
     if (!diary) return;
     
+    // 检查用户是否已登录
+    const currentUser = Taro.getStorageSync('user');
+    if (!currentUser || !currentUser.id) {
+      Taro.showModal({
+        title: '提示',
+        content: '请先登录后再点赞',
+        confirmText: '去登录',
+        cancelText: '取消',
+        success: function(res) {
+          if (res.confirm) {
+            Taro.navigateTo({
+              url: '/pages/login/index'
+            });
+          }
+        }
+      });
+      return;
+    }
+    
     try {
       const newLikeStatus = !isLiked;
       setIsLiked(newLikeStatus);
       
-      // 保存点赞状态到本地存储
+      // 保存点赞状态到本地存储，加入用户ID确保每个用户状态独立
       if (newLikeStatus) {
-        Taro.setStorageSync(`liked_diary_${diary.id}`, true);
+        Taro.setStorageSync(`liked_diary_${currentUser.id}_${diary.id}`, true);
       } else {
-        Taro.removeStorageSync(`liked_diary_${diary.id}`);
+        Taro.removeStorageSync(`liked_diary_${currentUser.id}_${diary.id}`);
       }
       
       // 显示提示
@@ -387,6 +425,25 @@ const Detail = () => {
   const handleFollow = async () => {
     if (!diary || !diary.author?.id) return;
     
+    // 检查用户是否已登录
+    const currentUser = Taro.getStorageSync('user');
+    if (!currentUser || !currentUser.id) {
+      Taro.showModal({
+        title: '提示',
+        content: '请先登录后再关注',
+        confirmText: '去登录',
+        cancelText: '取消',
+        success: function(res) {
+          if (res.confirm) {
+            Taro.navigateTo({
+              url: '/pages/login/index'
+            });
+          }
+        }
+      });
+      return;
+    }
+    
     try {
       const newFollowStatus = !isFollowed;
       setIsFollowed(newFollowStatus);
@@ -400,9 +457,9 @@ const Detail = () => {
       
       // 临时存储关注状态，实际项目中应该调用API
       if (newFollowStatus) {
-        Taro.setStorageSync(`followed_${diary.author.id}`, true);
+        Taro.setStorageSync(`followed_${currentUser.id}_${diary.author.id}`, true);
       } else {
-        Taro.removeStorageSync(`followed_${diary.author.id}`);
+        Taro.removeStorageSync(`followed_${currentUser.id}_${diary.author.id}`);
       }
       
       // 实际API调用示例
