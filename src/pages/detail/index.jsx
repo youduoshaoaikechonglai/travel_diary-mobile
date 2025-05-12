@@ -633,7 +633,7 @@ const Detail = () => {
       )}
 
       {/* 底部信息 - 在视频全屏时隐藏 */}
-      {!isFullscreenVideo && (
+      {!isFullscreenVideo && diary.status === 'approved' && (
         <View className='detail__footer'>
           <View className='detail__stats'>
             <View className='detail__stats-item' onClick={handleLike}>
