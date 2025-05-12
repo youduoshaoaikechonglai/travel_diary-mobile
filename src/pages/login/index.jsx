@@ -5,6 +5,10 @@ import api from '../../api';
 import './index.scss';
 
 const DEFAULT_AVATAR = 'https://img.yzcdn.cn/vant/cat.jpeg';
+const APP_LOGO = 'https://cdn-icons-png.flaticon.com/512/3125/3125713.png';
+const USER_ICON = 'https://cdn-icons-png.flaticon.com/512/456/456283.png';
+const PASSWORD_ICON = 'https://cdn-icons-png.flaticon.com/512/2889/2889676.png';
+const NICKNAME_ICON = 'https://cdn-icons-png.flaticon.com/512/3171/3171065.png';
 
 export default function Login() {
   const [isLogin, setIsLogin] = useState(true);
@@ -102,31 +106,77 @@ export default function Login() {
 
   return (
     <View className='login-page'>
-      <View className='switch-tab'>
-        <Text className={isLogin ? 'active' : ''} onClick={() => setIsLogin(true)}>登录</Text>
-        <Text className={!isLogin ? 'active' : ''} onClick={() => setIsLogin(false)}>注册</Text>
+      <View className='logo-area'>
+        <Image className='logo' src={APP_LOGO} />
+        <View className='title'>旅行日记</View>
       </View>
-      <View className='form-item'>
-        <Input placeholder='请输入账号' value={username} onInput={e => setUsername(e.detail.value)} />
+
+      <View className='auth-tabs'>
+        <View className={`auth-tab ${isLogin ? 'active' : ''}`} onClick={() => setIsLogin(true)}>
+          <Text className='tab-text'>账号登录</Text>
+        </View>
+        <View className={`auth-tab ${!isLogin ? 'active' : ''}`} onClick={() => setIsLogin(false)}>
+          <Text className='tab-text'>新用户注册</Text>
+        </View>
       </View>
-      <View className='form-item'>
-        <Input placeholder='请输入密码' password value={password} onInput={e => setPassword(e.detail.value)} />
-      </View>
-      {!isLogin && (
-        <>
-          <View className='form-item'>
-            <Input placeholder='请输入昵称' value={nickname} onInput={e => checkNickname(e.detail.value)} />
-            {nicknameStatus && <Text className={nicknameStatus === '昵称可用' ? 'ok' : 'err'}>{nicknameStatus}</Text>}
+
+      <View className='form-container'>
+        <View className='form-item'>
+          <View className='input-wrapper'>
+            <Image className='input-icon' src={USER_ICON} />
+            <Input
+              placeholder='请输入账号'
+              value={username}
+              onInput={e => setUsername(e.detail.value)}
+              placeholderStyle='color: #999'
+            />
           </View>
-          <View className='form-item avatar-upload'>
-            <Image src={avatar || DEFAULT_AVATAR} className='avatar' />
-            <Button size='mini' onClick={chooseAvatar}>上传头像</Button>
+        </View>
+        <View className='form-item'>
+          <View className='input-wrapper'>
+            <Image className='input-icon' src={PASSWORD_ICON} />
+            <Input
+              placeholder='请输入密码'
+              password
+              value={password}
+              onInput={e => setPassword(e.detail.value)}
+              placeholderStyle='color: #999'
+            />
           </View>
-        </>
-      )}
-      <Button className='submit-btn' type='primary' loading={loading} onClick={isLogin ? handleLogin : handleRegister}>
-        {isLogin ? '登录' : '注册'}
-      </Button>
+        </View>
+        {!isLogin && (
+          <>
+            <View className='form-item'>
+              <View className='input-wrapper'>
+                <Image className='input-icon' src={NICKNAME_ICON} />
+                <Input
+                  placeholder='请输入昵称'
+                  value={nickname}
+                  onInput={e => checkNickname(e.detail.value)}
+                  placeholderStyle='color: #999'
+                />
+              </View>
+              {nicknameStatus && <Text className={nicknameStatus === '昵称可用' ? 'ok' : 'err'}>{nicknameStatus}</Text>}
+            </View>
+            <View className='form-item avatar-container'>
+              <View className='avatar-upload'>
+                <Image src={avatar || DEFAULT_AVATAR} className='avatar' />
+                <Button size='mini' onClick={chooseAvatar}>选择头像</Button>
+              </View>
+            </View>
+          </>
+        )}
+        <Button className='submit-btn' loading={loading} onClick={isLogin ? handleLogin : handleRegister}>
+          {isLogin ? '登录' : '注册'}
+        </Button>
+      </View>
+
+      <View className='bottom-tips'>
+        <Text>登录即代表您已同意</Text>
+        <Text className='highlight'>《用户协议》</Text>
+        <Text>和</Text>
+        <Text className='highlight'>《隐私政策》</Text>
+      </View>
     </View>
   );
 } 
