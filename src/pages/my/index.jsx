@@ -76,11 +76,30 @@ export default function My() {
     return status === 'pending' || status === 'rejected';
   };
 
+  const handleLogout = () => {
+    Taro.showModal({
+      title: '提示',
+      content: '确定要退出登录吗？',
+      success: function (res) {
+        if (res.confirm) {
+          Taro.removeStorageSync('user');
+          Taro.showToast({ title: '已退出登录', icon: 'success' });
+          setTimeout(() => {
+            Taro.reLaunch({ url: '/pages/login/index' });
+          }, 500);
+        }
+      }
+    });
+  };
+
   return (
     <View className='my'>
       <View className='user-info'>
-        <Image className='avatar' src={user?.avatarUrl || 'https://img.yzcdn.cn/vant/cat.jpeg'} />
-        <Text className='nickname'>{user?.nickname || user?.username || '未登录'}</Text>
+        <View className='user-left'>
+          <Image className='avatar' src={user?.avatarUrl || 'https://img.yzcdn.cn/vant/cat.jpeg'} />
+          <Text className='nickname'>{user?.nickname || user?.username || '未登录'}</Text>
+        </View>
+        <View className='logout-btn' onClick={handleLogout}>退出登录</View>
       </View>
       <View className='header'>
         <Text className='title'>我的游记</Text>
