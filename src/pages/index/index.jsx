@@ -26,14 +26,17 @@ export default function Index() {
     }
     
     try {
-      // 调用 getNotes 接口，但不传递关键字参数
-      const result = await api.getNotes({
-        page: pageNum,
-        limit: 4
-      });
+      // 调用 getNotes 接口获取所有数据
+      const result = await api.getNotes();
       
       // 确保接口返回的是数组
-      const newDiaries = Array.isArray(result) ? result : (result?.data || []);
+      const allDiariesFromServer = Array.isArray(result) ? result : (result?.data || []);
+      
+      // 在前端实现分页逻辑
+      const limit = 4; // 每页显示数量
+      const startIndex = (pageNum - 1) * limit;
+      const endIndex = pageNum * limit;
+      const newDiaries = allDiariesFromServer.slice(startIndex, endIndex);
       
       let allDiaries;
       if (pageNum === 1 || isRefresh) {
@@ -63,8 +66,8 @@ export default function Index() {
       // 根据关键字过滤数据
       filterDiariesByKeyword(allDiaries, keyword);
       
-      // 判断是否还有更多数据
-      setHasMore(newDiaries.length >= 4);
+      // 判断是否还有更多数据：检查原始数据是否还有后续页
+      setHasMore(endIndex < allDiariesFromServer.length);
       setPage(pageNum);
     } catch (error) {
       console.error('获取游记列表失败', error);
